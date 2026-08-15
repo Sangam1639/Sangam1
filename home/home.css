@@ -1,0 +1,152 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+
+
+body {
+
+    min-height: 100vh;
+
+    background: linear-gradient(90deg, #121216 0.000%, #121216 7.692%, #16171a calc(7.692% + 1px), #16171a 15.385%, #1a1b1f calc(15.385% + 1px), #1a1b1f 23.077%, #1f2023 calc(23.077% + 1px), #1f2023 30.769%, #232427 calc(30.769% + 1px), #232427 38.462%, #27282b calc(38.462% + 1px), #27282b 46.154%, #2b2c2f calc(46.154% + 1px), #2b2c2f 53.846%, #2f3033 calc(53.846% + 1px), #2f3033 61.538%, #323337 calc(61.538% + 1px), #323337 69.231%, #36373a calc(69.231% + 1px), #36373a 76.923%, #38393d calc(76.923% + 1px), #38393d 84.615%, #3b3c40 calc(84.615% + 1px), #3b3c40 92.308%, #3d3e42 calc(92.308% + 1px) 100.000%);
+    background-size: cover;
+
+    align-items: center;
+    height: 120vh;
+}
+
+
+
+
+.header {
+    position: fixed;
+    display:flex;
+    width: 100%;
+    height: 10vh;
+    z-index: 1000;
+    background: white;
+
+    top: 0;
+    left: 0;
+
+}
+
+.logo {
+    font-size: 25px;
+        justify-content: center;
+    align-items: center;
+    align-content: center;
+    justify-items: center;
+    padding-left: 15px;
+    background-color: white;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.nav {
+    width: 100%;
+    padding-left: auto;
+
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    justify-items: center;
+
+    display: flex;
+    flex-direction: row;
+    column-gap: 40px;
+}
+
+
+ a {
+    padding: 8px;
+    font-family: sans-serif ;
+    font-size: 22px;
+    color: rgb(0, 0, 0);
+
+    text-decoration: none;
+}
+
+a i {
+    color: rgb(182, 12, 12);
+    font-size: 25px;
+}
+
+
+nav a {
+    border: 2px solid black;
+    border-radius: 30px;
+    transition: 0.3s;
+    background: black;
+    color: white;
+}
+
+nav a:hover {
+    transform: translateY(-4px);
+    background: black;
+    color: red;
+}
+
+#HOME {
+    background: red;
+    border: 2px solid black;
+    color: black;
+}
+
+#HOME:hover {
+    border: 2px solid red;
+    background: black;
+    color: red;
+}
+
+
+
+
+main {
+    padding-top: 16vh;
+}
+
+
+
+/* =========================
+   MOBILE RESPONSIVE NAVBAR
+   ========================= */
+
+@media (max-width: 700px) {
+
+    .header {
+        height: auto;
+        min-height: 80px;
+
+        flex-direction: column;
+        padding: 10px 0;
+    }
+
+    .logo {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .nav {
+        width: 100%;
+
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: center;
+        align-items: center;
+
+        gap: 10px;
+    }
+
+    .nav a {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+}

@@ -1,0 +1,3361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludo-A</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --gold:#d4af37;
+    --gold-light:#ffe58a;
+    --black:#030303;
+    --panel:#0d0d0d;
+
+    --blue:#168cff;
+    --red:#ed2024;
+    --green:#18c964;
+    --yellow:#ffd21f;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 15% 20%,#7a000055,transparent 30%),
+        radial-gradient(circle at 85% 80%,#d4af3738,transparent 30%),
+        #020202;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+
+/* Animated background */
+
+body::before,
+body::after{
+    content:"";
+    position:fixed;
+    width:450px;
+    height:450px;
+    border-radius:50%;
+    filter:blur(100px);
+    opacity:.16;
+    pointer-events:none;
+    z-index:-1;
+    animation:float 12s infinite alternate ease-in-out;
+}
+
+body::before{
+    background:#e00000;
+    left:-180px;
+    top:-180px;
+}
+
+body::after{
+    background:#d4af37;
+    right:-180px;
+    bottom:-180px;
+    animation-delay:-5s;
+}
+
+@keyframes float{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+    to{
+        transform:translate(130px,100px) scale(1.35);
+    }
+}
+
+button,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+/* HEADER */
+
+header{
+    height:72px;
+    padding:0 25px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:#050505e8;
+    border-bottom:1px solid #d4af3766;
+
+    backdrop-filter:blur(15px);
+
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:900;
+    letter-spacing:4px;
+    color:var(--gold);
+    text-shadow:0 0 20px #d4af3766;
+}
+
+.logo span{
+    color:white;
+}
+
+.header-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.gold-btn{
+    padding:9px 14px;
+
+    color:var(--gold);
+    background:#090909;
+
+    border:1px solid var(--gold);
+    border-radius:8px;
+
+    transition:.25s;
+}
+
+.gold-btn:hover{
+    color:#000;
+    background:var(--gold);
+    box-shadow:0 0 20px #d4af3766;
+}
+
+/* MAIN */
+
+.page{
+    width:min(1250px,96%);
+    margin:auto;
+    padding:25px 0 50px;
+}
+
+/* SETUP */
+
+.setup{
+    width:min(850px,100%);
+    margin:20px auto;
+
+    padding:35px;
+
+    background:#090909ee;
+    border:1px solid #d4af3766;
+    border-radius:22px;
+
+    box-shadow:0 0 60px #000;
+}
+
+.title{
+    text-align:center;
+
+    font-size:clamp(45px,8vw,75px);
+    letter-spacing:6px;
+
+    color:var(--gold);
+
+    text-shadow:
+        0 0 15px #d4af3766,
+        0 0 40px #d4af3722;
+}
+
+.subtitle{
+    text-align:center;
+    color:#777;
+    letter-spacing:3px;
+    margin:8px 0 30px;
+}
+
+.settings{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.setting{
+    padding:15px;
+
+    background:#111;
+    border:1px solid #292929;
+    border-radius:12px;
+}
+
+.setting label{
+    display:block;
+    color:#888;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+select{
+    width:100%;
+
+    padding:11px;
+
+    background:#050505;
+    color:white;
+
+    border:1px solid #444;
+    border-radius:8px;
+
+    outline:none;
+}
+
+select:focus{
+    border-color:var(--gold);
+}
+
+.section-title{
+    color:var(--gold);
+    margin:25px 0 12px;
+}
+
+.players-config{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.player-config{
+    padding:13px;
+
+    background:#111;
+    border:2px solid #292929;
+    border-radius:12px;
+}
+
+.player-config h4{
+    margin-bottom:10px;
+}
+
+.color-dot{
+    display:inline-block;
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    vertical-align:middle;
+    margin-right:5px;
+}
+
+.blue{
+    background:var(--blue);
+}
+
+.red{
+    background:var(--red);
+}
+
+.green{
+    background:var(--green);
+}
+
+.yellow{
+    background:var(--yellow);
+}
+
+.start-btn{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+
+    color:white;
+    font-weight:bold;
+    font-size:18px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #650000,
+            #d4af37,
+            #650000
+        );
+
+    border:1px solid var(--gold);
+    border-radius:10px;
+
+    transition:.25s;
+}
+
+.start-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 30px #d4af3766;
+}
+
+/* GAME */
+
+.game{
+    display:none;
+}
+
+.game.active{
+    display:block;
+}
+
+.game-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:15px;
+}
+
+.turn{
+    color:var(--gold);
+    font-size:20px;
+    font-weight:bold;
+}
+
+.status{
+    color:#888;
+}
+
+/* GAME LAYOUT */
+
+.game-layout{
+    display:grid;
+    grid-template-columns:minmax(300px,760px) 280px;
+    gap:20px;
+
+    justify-content:center;
+    align-items:start;
+}
+
+/* BOARD */
+
+.board-frame{
+    width:100%;
+    aspect-ratio:1;
+
+    padding:8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--gold),
+            #520000,
+            #111,
+            var(--gold)
+        );
+
+    border-radius:20px;
+
+    box-shadow:
+        0 0 40px #d4af3733,
+        0 0 80px #000;
+}
+
+#board{
+    display:block;
+
+    width:100%;
+    height:100%;
+
+    background:#111;
+
+    border:4px solid #050505;
+    border-radius:12px;
+
+    touch-action:none;
+}
+
+/* PANEL */
+
+.panel{
+    padding:17px;
+
+    background:#090909ee;
+
+    border:1px solid #d4af3755;
+    border-radius:15px;
+}
+
+.panel h2{
+    color:var(--gold);
+    margin-bottom:14px;
+}
+
+.player-status{
+    padding:11px;
+
+    margin-bottom:8px;
+
+    background:#0f0f0f;
+
+    border:1px solid #292929;
+    border-radius:9px;
+
+    transition:.25s;
+}
+
+.player-status.current{
+    border-color:var(--gold);
+
+    box-shadow:
+        0 0 15px #d4af3733;
+}
+
+.player-name{
+    font-weight:bold;
+}
+
+.player-info{
+    color:#777;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.dice{
+    width:95px;
+    height:95px;
+
+    margin:20px auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#f5f5f5;
+    color:#050505;
+
+    border-radius:17px;
+
+    font-size:48px;
+    font-weight:bold;
+
+    box-shadow:0 0 30px #ffffff22;
+}
+
+.dice.rolling{
+    animation:diceRoll .6s linear infinite;
+}
+
+@keyframes diceRoll{
+    0%{
+        transform:rotate(0) scale(1);
+    }
+
+    25%{
+        transform:rotate(90deg) scale(.8);
+    }
+
+    50%{
+        transform:rotate(180deg) scale(1.1);
+    }
+
+    75%{
+        transform:rotate(270deg) scale(.8);
+    }
+
+    100%{
+        transform:rotate(360deg) scale(1);
+    }
+}
+
+.roll-btn{
+    width:100%;
+    padding:13px;
+
+    background:var(--gold);
+    color:#000;
+
+    border:0;
+    border-radius:9px;
+
+    font-weight:bold;
+
+    transition:.2s;
+}
+
+.roll-btn:hover{
+    box-shadow:0 0 20px #d4af3766;
+}
+
+.roll-btn:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+}
+
+.message{
+    min-height:45px;
+
+    margin-top:14px;
+
+    text-align:center;
+    color:#aaa;
+
+    line-height:1.5;
+}
+
+.rules{
+    margin-top:18px;
+    padding-top:15px;
+
+    border-top:1px solid #292929;
+
+    color:#777;
+    font-size:12px;
+    line-height:1.8;
+}
+
+/* WINNER */
+
+#winner{
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    align-items:center;
+    justify-content:center;
+
+    background:#000d;
+
+    backdrop-filter:blur(12px);
+
+    z-index:500;
+}
+
+#winner.show{
+    display:flex;
+}
+
+.winner-box{
+    width:min(500px,90%);
+
+    padding:40px;
+
+    text-align:center;
+
+    background:#090909;
+
+    border:2px solid var(--gold);
+    border-radius:22px;
+
+    box-shadow:0 0 80px #d4af3766;
+
+    animation:winnerPop .5s ease;
+}
+
+@keyframes winnerPop{
+    from{
+        transform:scale(.5);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.winner-box h1{
+    color:var(--gold);
+    font-size:48px;
+    margin-bottom:10px;
+}
+
+.winner-box p{
+    color:#aaa;
+    margin-bottom:20px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+    .game-layout{
+        grid-template-columns:1fr;
+    }
+
+    .board-frame{
+        max-width:760px;
+        margin:auto;
+    }
+
+    .panel{
+        max-width:760px;
+        margin:auto;
+    }
+}
+
+@media(max-width:650px){
+
+    header{
+        padding:0 12px;
+    }
+
+    .logo{
+        font-size:18px;
+    }
+
+    .gold-btn{
+        padding:7px 9px;
+        font-size:12px;
+    }
+
+    .setup{
+        padding:20px;
+    }
+
+    .settings{
+        grid-template-columns:1fr;
+    }
+
+    .players-config{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .game-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:5px;
+    }
+
+    .board-frame{
+        padding:4px;
+    }
+}
+
+@media(max-width:400px){
+
+    .players-config{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        LUDO-<span>A</span>
+    </div>
+
+    <div class="header-buttons">
+        <button class="gold-btn" onclick="showSetup()">
+            NEW GAME
+        </button>
+
+        <button class="gold-btn" onclick="toggleFullscreen()">
+            ⛶
+        </button>
+    </div>
+
+</header>
+
+
+<main class="page">
+
+<!-- =====================================================
+     SETUP
+===================================================== -->
+
+<section id="setup">
+
+<div class="setup">
+
+<h1 class="title">
+    LUDO-A
+</h1>
+
+<p class="subtitle">
+    DARK • GOLD • BATTLE
+</p>
+
+
+<div class="settings">
+
+<div class="setting">
+
+<label>
+NUMBER OF PLAYERS
+</label>
+
+<select id="playerCount">
+    <option value="2">2 Players</option>
+    <option value="3">3 Players</option>
+    <option value="4" selected>4 Players</option>
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>
+COMPUTER PLAYERS
+</label>
+
+<select id="computerCount">
+    <option value="0">0 Computer</option>
+    <option value="1">1 Computer</option>
+    <option value="2">2 Computers</option>
+    <option value="3">3 Computers</option>
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>
+GOTHI UNLOCK NUMBER
+</label>
+
+<select id="unlockNumber">
+
+    <option value="6" selected>
+        6
+    </option>
+
+    <option value="5">
+        5
+    </option>
+
+    <option value="1">
+        1
+    </option>
+
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>
+CAPTURE / RESET
+</label>
+
+<select id="captureRule">
+
+    <option value="yes">
+        Yes — reset enemy gothi
+    </option>
+
+    <option value="no">
+        No — capture disabled
+    </option>
+
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>
+EXTRA TURN ON 6
+</label>
+
+<select id="extraTurn">
+
+    <option value="yes" selected>
+        Yes
+    </option>
+
+    <option value="no">
+        No
+    </option>
+
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>
+ANIMATION
+</label>
+
+<select id="animation">
+
+    <option value="full" selected>
+        Full Animation
+    </option>
+
+    <option value="fast">
+        Fast
+    </option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<h3 class="section-title">
+    PLAYER COLOURS
+</h3>
+
+
+<div class="players-config">
+
+<div class="player-config" id="config0">
+
+<h4>
+<span class="color-dot blue"></span>
+Player 1
+</h4>
+
+<select id="color0">
+    <option value="blue">Blue</option>
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+    <option value="yellow">Yellow</option>
+</select>
+
+</div>
+
+
+<div class="player-config" id="config1">
+
+<h4>
+<span class="color-dot red"></span>
+Player 2
+</h4>
+
+<select id="color1">
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+    <option value="yellow">Yellow</option>
+</select>
+
+</div>
+
+
+<div class="player-config" id="config2">
+
+<h4>
+<span class="color-dot green"></span>
+Player 3
+</h4>
+
+<select id="color2">
+    <option value="green">Green</option>
+    <option value="blue">Blue</option>
+    <option value="red">Red</option>
+    <option value="yellow">Yellow</option>
+</select>
+
+</div>
+
+
+<div class="player-config" id="config3">
+
+<h4>
+<span class="color-dot yellow"></span>
+Player 4
+</h4>
+
+<select id="color3">
+    <option value="yellow">Yellow</option>
+    <option value="blue">Blue</option>
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+</select>
+
+</div>
+
+</div>
+
+
+<button class="start-btn" onclick="startGame()">
+    START LUDO-A
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     GAME
+===================================================== -->
+
+<section id="game" class="game">
+
+<div class="game-header">
+
+<div class="turn" id="turn">
+    Player 1's Turn
+</div>
+
+<div class="status" id="status">
+    Roll the dice
+</div>
+
+</div>
+
+
+<div class="game-layout">
+
+
+<div class="board-frame">
+
+<canvas id="board"></canvas>
+
+</div>
+
+
+<aside class="panel">
+
+<h2>
+    PLAYERS
+</h2>
+
+<div id="playersList"></div>
+
+
+<div class="dice" id="dice">
+    ?
+</div>
+
+
+<button
+    class="roll-btn"
+    id="rollBtn"
+    onclick="rollDice()"
+>
+    ROLL DICE
+</button>
+
+
+<div class="message" id="message">
+    Roll the dice to begin.
+</div>
+
+
+<div class="rules">
+
+<strong>RULES</strong><br>
+
+• Roll 6 to unlock a gothi.<br>
+
+• Move according to dice number.<br>
+
+• A gothi must reach the final home.<br>
+
+• Landing on an enemy captures it.<br>
+
+• Safe squares cannot be captured.<br>
+
+• Multiple friendly gothis may share a square.<br>
+
+• Roll 6 for another turn.<br>
+
+• All four gothis must reach home to win.
+
+</div>
+
+</aside>
+
+</div>
+
+</section>
+
+</main>
+
+
+<!-- WINNER -->
+
+<div id="winner">
+
+<div class="winner-box">
+
+<h1 id="winnerTitle">
+    WINNER!
+</h1>
+
+<p id="winnerMessage">
+    Congratulations!
+</p>
+
+<button class="start-btn" onclick="showSetup()">
+    PLAY AGAIN
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   LUDO-A GAME ENGINE
+========================================================= */
+
+
+/*
+    BOARD MODEL
+
+    15 x 15 visual board.
+
+    52 positions around the playable track.
+
+    Each player's progress:
+
+    -1  = base
+     0  = starting square
+    1-51 = track
+    52-56 = coloured home lane
+    57 = finished
+*/
+
+
+const COLORS = {
+
+    blue:"#168cff",
+
+    red:"#ed2024",
+
+    green:"#18c964",
+
+    yellow:"#ffd21f"
+
+};
+
+
+const DARK = {
+
+    blue:"#063d78",
+
+    red:"#69090b",
+
+    green:"#08642f",
+
+    yellow:"#806a00"
+
+};
+
+
+/*
+    Player starting positions.
+
+    Blue starts at 0.
+    Red starts at 13.
+    Green starts at 26.
+    Yellow starts at 39.
+*/
+
+const START = {
+
+    blue:0,
+
+    red:13,
+
+    green:26,
+
+    yellow:39
+
+};
+
+
+/*
+    52-square outer route.
+
+    These coordinates form the traditional
+    cross-shaped Ludo track.
+*/
+
+const TRACK = [
+
+    [6,0],
+    [7,0],
+    [8,0],
+    [8,1],
+    [8,2],
+
+    [9,2],
+    [10,2],
+    [11,2],
+    [12,2],
+    [13,2],
+    [14,2],
+
+    [14,3],
+    [14,4],
+
+    [13,4],
+    [12,4],
+    [11,4],
+    [10,4],
+    [9,4],
+    [8,4],
+
+    [8,5],
+    [8,6],
+
+    [9,6],
+    [10,6],
+    [11,6],
+    [12,6],
+    [13,6],
+    [14,6],
+
+    [14,7],
+
+    [14,8],
+    [13,8],
+    [12,8],
+    [11,8],
+    [10,8],
+    [9,8],
+    [8,8],
+
+    [8,9],
+    [8,10],
+    [8,11],
+    [8,12],
+    [8,13],
+    [8,14],
+
+    [7,14],
+    [6,14],
+
+    [6,13],
+    [6,12],
+    [6,11],
+    [6,10],
+    [6,9],
+    [6,8],
+
+    [5,8],
+    [4,8],
+    [3,8],
+    [2,8],
+    [1,8],
+    [0,8],
+
+    [0,7],
+
+    [0,6],
+    [1,6],
+    [2,6],
+    [3,6],
+    [4,6],
+    [5,6],
+
+    [6,6],
+
+    [6,5],
+    [6,4],
+    [6,3],
+    [6,2],
+    [6,1]
+
+];
+
+
+/*
+    The visible route above contains 68 visual
+    cells because the arms include transition cells.
+
+    The actual logical Ludo track uses the
+    first 52 logical positions below.
+
+    These are generated around the center route.
+*/
+
+const LOGICAL_TRACK = [
+
+    [6,0],[7,0],[8,0],
+    [8,1],[8,2],
+    [9,2],[10,2],[11,2],[12,2],[13,2],[14,2],
+    [14,3],[14,4],
+    [13,4],[12,4],[11,4],[10,4],[9,4],[8,4],
+    [8,5],[8,6],
+    [9,6],[10,6],[11,6],[12,6],[13,6],[14,6],
+    [14,7],
+    [14,8],[13,8],[12,8],[11,8],[10,8],[9,8],[8,8],
+    [8,9],[8,10],[8,11],[8,12],[8,13],[8,14],
+    [7,14],[6,14],
+    [6,13],[6,12],[6,11],[6,10],[6,9],
+    [6,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8],
+    [0,7],
+    [0,6],[1,6],[2,6],[3,6],[4,6],[5,6],
+    [6,6],
+    [6,5],[6,4],[6,3],[6,2],[6,1]
+
+];
+
+
+/*
+    Safe squares.
+*/
+
+const SAFE = [
+
+    0,
+    8,
+    13,
+    21,
+    26,
+    34,
+    39,
+    47
+
+];
+
+
+/*
+    Home lanes.
+
+    The sixth position is the final home.
+*/
+
+const HOME_LANES = {
+
+    blue:[
+        [7,1],
+        [7,2],
+        [7,3],
+        [7,4],
+        [7,5],
+        [7,6]
+    ],
+
+    red:[
+        [13,7],
+        [12,7],
+        [11,7],
+        [10,7],
+        [9,7],
+        [8,7]
+    ],
+
+    green:[
+        [7,13],
+        [7,12],
+        [7,11],
+        [7,10],
+        [7,9],
+        [7,8]
+    ],
+
+    yellow:[
+        [1,7],
+        [2,7],
+        [3,7],
+        [4,7],
+        [5,7],
+        [6,7]
+    ]
+
+};
+
+
+/*
+    Base positions.
+*/
+
+const BASE_POSITIONS = {
+
+    blue:[
+        [1,1],
+        [3,1],
+        [1,3],
+        [3,3]
+    ],
+
+    red:[
+        [12,1],
+        [14,1],
+        [12,3],
+        [14,3]
+    ],
+
+    green:[
+        [12,12],
+        [14,12],
+        [12,14],
+        [14,14]
+    ],
+
+    yellow:[
+        [1,12],
+        [3,12],
+        [1,14],
+        [3,14]
+    ]
+
+};
+
+
+let players=[];
+
+let currentPlayer=0;
+
+let diceValue=0;
+
+let lastRoll=0;
+
+let rolling=false;
+
+let choosingPiece=false;
+
+let gameOver=false;
+
+let canvasSize=600;
+
+const canvas=document.getElementById("board");
+
+const ctx=canvas.getContext("2d");
+
+
+/* =========================================================
+   START
+========================================================= */
+
+function startGame(){
+
+    const count=
+        Number(document.getElementById("playerCount").value);
+
+    let computers=
+        Number(document.getElementById("computerCount").value);
+
+    computers=Math.min(computers,count-1);
+
+    players=[];
+
+    for(let i=0;i<count;i++){
+
+        players.push({
+
+            id:i,
+
+            name:`Player ${i+1}`,
+
+            color:
+                document.getElementById(
+                    `color${i}`
+                ).value,
+
+            computer:
+                i>=count-computers,
+
+            pieces:[
+                newPiece(),
+                newPiece(),
+                newPiece(),
+                newPiece()
+            ]
+
+        });
+
+    }
+
+    currentPlayer=0;
+
+    diceValue=0;
+
+    lastRoll=0;
+
+    rolling=false;
+
+    choosingPiece=false;
+
+    gameOver=false;
+
+    document.getElementById("setup").style.display="none";
+
+    document.getElementById("game").classList.add("active");
+
+    resizeCanvas();
+
+    updateUI();
+
+    showMessage("Roll the dice to begin.");
+
+    if(players[currentPlayer].computer){
+
+        setTimeout(
+            rollDice,
+            800
+        );
+    }
+}
+
+
+function newPiece(){
+
+    return {
+
+        progress:-1,
+
+        finished:false
+
+    };
+
+}
+
+
+/* =========================================================
+   SETUP
+========================================================= */
+
+function showSetup(){
+
+    document.getElementById("game").classList.remove("active");
+
+    document.getElementById("setup").style.display="block";
+
+    document.getElementById("winner").classList.remove("show");
+
+    gameOver=false;
+
+}
+
+
+function toggleFullscreen(){
+
+    if(!document.fullscreenElement){
+
+        document.documentElement.requestFullscreen()
+            .catch(()=>{});
+
+    }else{
+
+        document.exitFullscreen()
+            .catch(()=>{});
+
+    }
+
+}
+
+
+/* =========================================================
+   PLAYER COUNT
+========================================================= */
+
+function updatePlayerSettings(){
+
+    const count=
+        Number(document.getElementById("playerCount").value);
+
+    for(let i=0;i<4;i++){
+
+        document.getElementById(
+            `config${i}`
+        ).style.display=
+            i<count
+            ?"block"
+            :"none";
+    }
+
+    const computer=
+        document.getElementById("computerCount");
+
+    [...computer.options].forEach(option=>{
+
+        option.disabled=
+            Number(option.value)>count-1;
+
+    });
+
+    if(
+        Number(computer.value)>count-1
+    ){
+
+        computer.value=
+            String(Math.max(0,count-1));
+
+    }
+
+}
+
+
+document
+    .getElementById("playerCount")
+    .addEventListener(
+        "change",
+        updatePlayerSettings
+    );
+
+
+updatePlayerSettings();
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+function resizeCanvas(){
+
+    const rect=
+        canvas.getBoundingClientRect();
+
+    canvasSize=
+        Math.min(
+            rect.width,
+            rect.height
+        );
+
+    const ratio=
+        window.devicePixelRatio||1;
+
+    canvas.width=
+        canvasSize*ratio;
+
+    canvas.height=
+        canvasSize*ratio;
+
+    ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+    draw();
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* =========================================================
+   DRAW
+========================================================= */
+
+function draw(){
+
+    if(!canvasSize)return;
+
+    ctx.clearRect(
+        0,
+        0,
+        canvasSize,
+        canvasSize
+    );
+
+    const cell=
+        canvasSize/15;
+
+    drawBoardBackground(cell);
+
+    drawBases(cell);
+
+    drawTrack(cell);
+
+    drawHomeLanes(cell);
+
+    drawCenter(cell);
+
+    drawPieces(cell);
+
+}
+
+
+/* =========================================================
+   BOARD BACKGROUND
+========================================================= */
+
+function drawBoardBackground(cell){
+
+    ctx.fillStyle="#111";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvasSize,
+        canvasSize
+    );
+
+    for(let y=0;y<15;y++){
+
+        for(let x=0;x<15;x++){
+
+            ctx.strokeStyle="#252525";
+
+            ctx.lineWidth=1;
+
+            ctx.strokeRect(
+                x*cell,
+                y*cell,
+                cell,
+                cell
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   BASES
+========================================================= */
+
+function drawBases(cell){
+
+    drawBase(
+        0,
+        0,
+        "blue",
+        cell
+    );
+
+    drawBase(
+        11,
+        0,
+        "red",
+        cell
+    );
+
+    drawBase(
+        11,
+        11,
+        "green",
+        cell
+    );
+
+    drawBase(
+        0,
+        11,
+        "yellow",
+        cell
+    );
+
+}
+
+
+function drawBase(
+    gridX,
+    gridY,
+    color,
+    cell
+){
+
+    ctx.fillStyle=
+        DARK[color];
+
+    ctx.fillRect(
+        gridX*cell,
+        gridY*cell,
+        cell*4,
+        cell*4
+    );
+
+    ctx.strokeStyle=
+        COLORS[color];
+
+    ctx.lineWidth=3;
+
+    ctx.strokeRect(
+        gridX*cell+2,
+        gridY*cell+2,
+        cell*4-4,
+        cell*4-4
+    );
+
+    BASE_POSITIONS[color]
+        .forEach(pos=>{
+
+            ctx.beginPath();
+
+            ctx.arc(
+                pos[0]*cell,
+                pos[1]*cell,
+                cell*.43,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle="#080808";
+
+            ctx.fill();
+
+            ctx.strokeStyle=
+                COLORS[color];
+
+            ctx.lineWidth=2;
+
+            ctx.stroke();
+
+        });
+
+}
+
+
+/* =========================================================
+   TRACK
+========================================================= */
+
+function drawTrack(cell){
+
+    LOGICAL_TRACK.forEach(
+        (pos,index)=>{
+
+            const x=
+                pos[0]*cell;
+
+            const y=
+                pos[1]*cell;
+
+            ctx.fillStyle=
+                SAFE.includes(index)
+                ?"#292929"
+                :"#181818";
+
+            ctx.fillRect(
+                x+1,
+                y+1,
+                cell-2,
+                cell-2
+            );
+
+            ctx.strokeStyle="#353535";
+
+            ctx.strokeRect(
+                x+1,
+                y+1,
+                cell-2,
+                cell-2
+            );
+
+            if(SAFE.includes(index)){
+
+                drawStar(
+                    x+cell/2,
+                    y+cell/2,
+                    cell*.24
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   HOME LANES
+========================================================= */
+
+function drawHomeLanes(cell){
+
+    Object.entries(HOME_LANES)
+        .forEach(
+            ([color,lane])=>{
+
+                lane.forEach(
+                    (pos,index)=>{
+
+                        const x=
+                            pos[0]*cell;
+
+                        const y=
+                            pos[1]*cell;
+
+                        ctx.fillStyle=
+                            index===5
+                            ?COLORS[color]
+                            :DARK[color];
+
+                        ctx.fillRect(
+                            x+1,
+                            y+1,
+                            cell-2,
+                            cell-2
+                        );
+
+                        ctx.strokeStyle=
+                            COLORS[color];
+
+                        ctx.strokeRect(
+                            x+1,
+                            y+1,
+                            cell-2,
+                            cell-2
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   CENTER
+========================================================= */
+
+function drawCenter(cell){
+
+    const cx=
+        7.5*cell;
+
+    const cy=
+        7.5*cell;
+
+    const radius=
+        cell*1.7;
+
+    const colors=[
+        COLORS.blue,
+        COLORS.red,
+        COLORS.green,
+        COLORS.yellow
+    ];
+
+    for(let i=0;i<4;i++){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            cx,
+            cy
+        );
+
+        ctx.arc(
+            cx,
+            cy,
+            radius,
+            i*Math.PI/2,
+            (i+1)*Math.PI/2
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle=
+            colors[i];
+
+        ctx.globalAlpha=.75;
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha=1;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx,
+        cy,
+        cell*.15,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle="white";
+
+    ctx.fill();
+
+}
+
+
+/* =========================================================
+   STAR
+========================================================= */
+
+function drawStar(
+    cx,
+    cy,
+    radius
+){
+
+    ctx.beginPath();
+
+    for(let i=0;i<10;i++){
+
+        const angle=
+            -Math.PI/2+
+            i*Math.PI/5;
+
+        const r=
+            i%2===0
+            ?radius
+            :radius*.4;
+
+        const x=
+            cx+
+            Math.cos(angle)*r;
+
+        const y=
+            cy+
+            Math.sin(angle)*r;
+
+        if(i===0){
+
+            ctx.moveTo(
+                x,
+                y
+            );
+
+        }else{
+
+            ctx.lineTo(
+                x,
+                y
+            );
+
+        }
+
+    }
+
+    ctx.closePath();
+
+    ctx.fillStyle="#d4af37aa";
+
+    ctx.fill();
+
+}
+
+
+/* =========================================================
+   PIECES
+========================================================= */
+
+function drawPieces(cell){
+
+    if(!players.length)return;
+
+    players.forEach(
+        (player,playerIndex)=>{
+
+            player.pieces.forEach(
+                (piece,pieceIndex)=>{
+
+                    if(piece.finished)return;
+
+                    const pos=
+                        piecePosition(
+                            player,
+                            piece,
+                            pieceIndex
+                        );
+
+                    if(!pos)return;
+
+                    drawToken(
+                        pos[0]*cell+cell/2,
+                        pos[1]*cell+cell/2,
+                        cell*.34,
+                        player.color,
+                        playerIndex,
+                        pieceIndex
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+function drawToken(
+    cx,
+    cy,
+    radius,
+    color,
+    playerIndex,
+    pieceIndex
+){
+
+    ctx.save();
+
+    const isSelectable=
+        playerIndex===currentPlayer &&
+        choosingPiece &&
+        canMove(
+            playerIndex,
+            pieceIndex
+        );
+
+    if(isSelectable){
+
+        const pulse=
+            Math.sin(
+                Date.now()/180
+            )*3;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            cx,
+            cy,
+            radius+7+pulse,
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle="#fff";
+
+        ctx.lineWidth=3;
+
+        ctx.globalAlpha=.8;
+
+        ctx.stroke();
+
+        ctx.globalAlpha=1;
+
+    }
+
+    ctx.shadowColor=
+        COLORS[color];
+
+    ctx.shadowBlur=
+        isSelectable
+        ?25
+        :12;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx,
+        cy,
+        radius,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle=
+        COLORS[color];
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+    ctx.strokeStyle="white";
+
+    ctx.lineWidth=2;
+
+    ctx.stroke();
+
+    /*
+        Highlight
+    */
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx-radius*.25,
+        cy-radius*.25,
+        radius*.2,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle="#ffffffaa";
+
+    ctx.fill();
+
+    /*
+        Gothi number
+    */
+
+    ctx.fillStyle="#000";
+
+    ctx.font=
+        `bold ${radius*.55}px Arial`;
+
+    ctx.textAlign="center";
+
+    ctx.textBaseline="middle";
+
+    ctx.fillText(
+        pieceIndex+1,
+        cx,
+        cy+1
+    );
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   PIECE POSITION
+========================================================= */
+
+function piecePosition(
+    player,
+    piece,
+    pieceIndex
+){
+
+    /*
+        In base
+    */
+
+    if(piece.progress===-1){
+
+        return BASE_POSITIONS[
+            player.color
+        ][pieceIndex];
+
+    }
+
+
+    /*
+        Outer track
+    */
+
+    if(piece.progress<=51){
+
+        const globalIndex=
+            (
+                START[player.color]+
+                piece.progress
+            )%52;
+
+        return LOGICAL_TRACK[
+            globalIndex
+        ];
+
+    }
+
+
+    /*
+        Home lane
+    */
+
+    if(piece.progress<=56){
+
+        return HOME_LANES[
+            player.color
+        ][
+            piece.progress-52
+        ];
+
+    }
+
+    return null;
+
+}
+
+
+/* =========================================================
+   ROLL
+========================================================= */
+
+function rollDice(){
+
+    if(
+        rolling||
+        choosingPiece||
+        gameOver
+    )return;
+
+    rolling=true;
+
+    document.getElementById(
+        "rollBtn"
+    ).disabled=true;
+
+    const dice=
+        document.getElementById("dice");
+
+    dice.classList.add("rolling");
+
+    showMessage(
+        players[currentPlayer].computer
+        ?"Computer is rolling..."
+        :"Rolling..."
+    );
+
+    let count=0;
+
+    const interval=
+        setInterval(()=>{
+
+            dice.textContent=
+                Math.floor(
+                    Math.random()*6
+                )+1;
+
+            count++;
+
+            if(count>=10){
+
+                clearInterval(interval);
+
+                diceValue=
+                    Math.floor(
+                        Math.random()*6
+                    )+1;
+
+                lastRoll=diceValue;
+
+                dice.textContent=
+                    diceValue;
+
+                dice.classList.remove(
+                    "rolling"
+                );
+
+                rolling=false;
+
+                afterRoll();
+
+            }
+
+        },70);
+
+}
+
+
+/* =========================================================
+   AFTER ROLL
+========================================================= */
+
+function afterRoll(){
+
+    const player=
+        players[currentPlayer];
+
+    const moves=[];
+
+    for(let i=0;i<4;i++){
+
+        if(
+            canMove(
+                currentPlayer,
+                i
+            )
+        ){
+
+            moves.push(i);
+
+        }
+
+    }
+
+    document.getElementById(
+        "status"
+    ).textContent=
+        `Rolled ${diceValue}`;
+
+    /*
+        No legal move
+    */
+
+    if(moves.length===0){
+
+        showMessage(
+            `${player.name} cannot move.`
+        );
+
+        setTimeout(
+            endRollTurn,
+            800
+        );
+
+        return;
+    }
+
+    choosingPiece=true;
+
+    draw();
+
+    if(player.computer){
+
+        setTimeout(()=>{
+
+            const selected=
+                computerChoose(
+                    moves
+                );
+
+            movePiece(
+                currentPlayer,
+                selected
+            );
+
+        },600);
+
+    }else if(moves.length===1){
+
+        /*
+            Automatically move the only
+            possible gothi.
+        */
+
+        setTimeout(()=>{
+
+            movePiece(
+                currentPlayer,
+                moves[0]
+            );
+
+        },400);
+
+    }else{
+
+        showMessage(
+            "Choose a glowing gothi."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CAN MOVE
+========================================================= */
+
+function canMove(
+    playerIndex,
+    pieceIndex
+){
+
+    const piece=
+        players[
+            playerIndex
+        ].pieces[
+            pieceIndex
+        ];
+
+    if(piece.finished){
+        return false;
+    }
+
+    /*
+        In base.
+        Unlock number can be customized.
+    */
+
+    if(piece.progress===-1){
+
+        return diceValue===
+            Number(
+                document.getElementById(
+                    "unlockNumber"
+                ).value
+            );
+
+    }
+
+    /*
+        Cannot move beyond final home.
+    */
+
+    return (
+        piece.progress+
+        diceValue
+    )<=57;
+
+}
+
+
+/* =========================================================
+   COMPUTER AI
+========================================================= */
+
+function computerChoose(
+    possible
+){
+
+    let best=
+        possible[0];
+
+    let bestScore=
+        -Infinity;
+
+    const player=
+        players[currentPlayer];
+
+    possible.forEach(index=>{
+
+        const piece=
+            player.pieces[index];
+
+        let score=
+            Math.random()*10;
+
+        const target=
+            piece.progress===-1
+            ?0
+            :piece.progress+diceValue;
+
+        /*
+            Finishing gets highest priority.
+        */
+
+        if(target===57){
+
+            score+=10000;
+
+        }
+
+        /*
+            Entering home lane.
+        */
+
+        if(target>=52){
+
+            score+=500;
+
+        }
+
+        /*
+            Unlocking a gothi.
+        */
+
+        if(piece.progress===-1){
+
+            score+=300;
+
+        }
+
+        /*
+            Capture enemy.
+        */
+
+        if(
+            willCapture(
+                currentPlayer,
+                index
+            )
+        ){
+
+            score+=1500;
+
+        }
+
+        /*
+            Advance further.
+        */
+
+        score+=target;
+
+        if(score>bestScore){
+
+            bestScore=score;
+
+            best=index;
+
+        }
+
+    });
+
+    return best;
+
+}
+
+
+/* =========================================================
+   CAPTURE CHECK
+========================================================= */
+
+function willCapture(
+    playerIndex,
+    pieceIndex
+){
+
+    if(
+        document.getElementById(
+            "captureRule"
+        ).value==="no"
+    ){
+
+        return false;
+
+    }
+
+    const player=
+        players[playerIndex];
+
+    const piece=
+        player.pieces[pieceIndex];
+
+    const target=
+        piece.progress===-1
+        ?0
+        :piece.progress+diceValue;
+
+    if(
+        target<0||
+        target>51
+    ){
+
+        return false;
+
+    }
+
+    const position=
+        (
+            START[player.color]+
+            target
+        )%52;
+
+    /*
+        Safe squares cannot capture.
+    */
+
+    if(SAFE.includes(position)){
+
+        return false;
+
+    }
+
+    for(
+        let i=0;
+        i<players.length;
+        i++
+    ){
+
+        if(i===playerIndex)continue;
+
+        const enemy=
+            players[i];
+
+        for(
+            const enemyPiece
+            of enemy.pieces
+        ){
+
+            if(
+                enemyPiece.progress>=0&&
+                enemyPiece.progress<=51
+            ){
+
+                const enemyPosition=
+                    (
+                        START[enemy.color]+
+                        enemyPiece.progress
+                    )%52;
+
+                if(
+                    enemyPosition===
+                    position
+                ){
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   MOVE
+========================================================= */
+
+function movePiece(
+    playerIndex,
+    pieceIndex
+){
+
+    if(
+        !choosingPiece||
+        !canMove(
+            playerIndex,
+            pieceIndex
+        )
+    ){
+
+        return;
+
+    }
+
+    choosingPiece=false;
+
+    const player=
+        players[playerIndex];
+
+    const piece=
+        player.pieces[pieceIndex];
+
+    const old=
+        piece.progress;
+
+    let target;
+
+    /*
+        Unlock
+    */
+
+    if(old===-1){
+
+        target=0;
+
+    }else{
+
+        target=
+            old+
+            diceValue;
+
+    }
+
+    /*
+        Store old roll before clearing it.
+    */
+
+    const rolled=
+        diceValue;
+
+    diceValue=0;
+
+    /*
+        Fast mode
+    */
+
+    if(
+        document.getElementById(
+            "animation"
+        ).value==="fast"||
+        old===-1
+    ){
+
+        piece.progress=target;
+
+        draw();
+
+        finishMove(
+            playerIndex,
+            pieceIndex,
+            rolled
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Animated movement.
+    */
+
+    let current=old;
+
+    const steps=
+        target-old;
+
+    let step=0;
+
+    function animate(){
+
+        step++;
+
+        current=
+            old+
+            step;
+
+        piece.progress=
+            current;
+
+        draw();
+
+        if(step<steps){
+
+            setTimeout(
+                animate,
+                100
+            );
+
+        }else{
+
+            finishMove(
+                playerIndex,
+                pieceIndex,
+                rolled
+            );
+
+        }
+
+    }
+
+    animate();
+
+}
+
+
+/* =========================================================
+   FINISH MOVE
+========================================================= */
+
+function finishMove(
+    playerIndex,
+    pieceIndex,
+    rolled
+){
+
+    const player=
+        players[playerIndex];
+
+    const piece=
+        player.pieces[pieceIndex];
+
+    /*
+        Reached final home
+    */
+
+    if(piece.progress===57){
+
+        piece.finished=true;
+
+        showMessage(
+            `${player.name}'s gothi reached HOME! 🏆`
+        );
+
+    }
+
+
+    /*
+        Capture
+    */
+
+    let captured=false;
+
+    if(
+        !piece.finished&&
+        piece.progress>=0&&
+        piece.progress<=51&&
+        document.getElementById(
+            "captureRule"
+        ).value==="yes"
+    ){
+
+        const position=
+            (
+                START[player.color]+
+                piece.progress
+            )%52;
+
+        if(!SAFE.includes(position)){
+
+            players.forEach(
+                (enemy,enemyIndex)=>{
+
+                    if(
+                        enemyIndex===
+                        playerIndex
+                    ){
+
+                        return;
+
+                    }
+
+                    enemy.pieces.forEach(
+                        enemyPiece=>{
+
+                            if(
+                                enemyPiece.finished||
+                                enemyPiece.progress<0||
+                                enemyPiece.progress>51
+                            ){
+
+                                return;
+
+                            }
+
+                            const enemyPosition=
+                                (
+                                    START[enemy.color]+
+                                    enemyPiece.progress
+                                )%52;
+
+                            if(
+                                enemyPosition===
+                                position
+                            ){
+
+                                enemyPiece.progress=-1;
+
+                                captured=true;
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    }
+
+
+    draw();
+
+    if(captured){
+
+        showMessage(
+            `${player.name} captured an enemy gothi! 💥`
+        );
+
+        /*
+            Small capture effect
+        */
+
+        flashCapture();
+
+    }
+
+
+    /*
+        Winner
+    */
+
+    if(
+        player.pieces.every(
+            p=>p.finished
+        )
+    ){
+
+        showWinner(player);
+
+        return;
+
+    }
+
+
+    /*
+        Extra turn on six.
+    */
+
+    if(
+        rolled===6&&
+        document.getElementById(
+            "extraTurn"
+        ).value==="yes"
+    ){
+
+        setTimeout(()=>{
+
+            document.getElementById(
+                "rollBtn"
+            ).disabled=false;
+
+            showMessage(
+                `${player.name} rolled a 6 — EXTRA TURN! 🎲`
+            );
+
+            if(player.computer){
+
+                setTimeout(
+                    rollDice,
+                    500
+                );
+
+            }
+
+        },600);
+
+        return;
+
+    }
+
+
+    /*
+        Next player.
+    */
+
+    setTimeout(
+        nextPlayer,
+        600
+    );
+
+}
+
+
+/* =========================================================
+   NEXT PLAYER
+========================================================= */
+
+function nextPlayer(){
+
+    if(gameOver)return;
+
+    currentPlayer=
+        (
+            currentPlayer+1
+        )%players.length;
+
+    diceValue=0;
+
+    choosingPiece=false;
+
+    document.getElementById(
+        "dice"
+    ).textContent="?";
+
+    document.getElementById(
+        "status"
+    ).textContent=
+        "Roll the dice";
+
+    updateUI();
+
+    draw();
+
+    const player=
+        players[currentPlayer];
+
+    if(player.computer){
+
+        document.getElementById(
+            "rollBtn"
+        ).disabled=true;
+
+        showMessage(
+            `${player.name} is thinking...`
+        );
+
+        setTimeout(
+            rollDice,
+            700
+        );
+
+    }else{
+
+        document.getElementById(
+            "rollBtn"
+        ).disabled=false;
+
+        showMessage(
+            `${player.name}, roll the dice.`
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   NO MOVE
+========================================================= */
+
+function endRollTurn(){
+
+    if(
+        lastRoll===6&&
+        document.getElementById(
+            "extraTurn"
+        ).value==="yes"
+    ){
+
+        document.getElementById(
+            "rollBtn"
+        ).disabled=false;
+
+        showMessage(
+            `${players[currentPlayer].name} gets another turn!`
+        );
+
+        if(
+            players[currentPlayer].computer
+        ){
+
+            setTimeout(
+                rollDice,
+                500
+            );
+
+        }
+
+        return;
+
+    }
+
+    nextPlayer();
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(){
+
+    const player=
+        players[currentPlayer];
+
+    document.getElementById(
+        "turn"
+    ).textContent=
+        `${player.name}'s Turn`;
+
+    const list=
+        document.getElementById(
+            "playersList"
+        );
+
+    list.innerHTML="";
+
+    players.forEach(
+        (p,index)=>{
+
+            const home=
+                p.pieces.filter(
+                    piece=>piece.finished
+                ).length;
+
+            const div=
+                document.createElement(
+                    "div"
+                );
+
+            div.className=
+                "player-status "+
+                (
+                    index===currentPlayer
+                    ?"current"
+                    :""
+                );
+
+            div.innerHTML=`
+
+                <div class="player-name">
+
+                    <span
+                        class="color-dot ${p.color}"
+                    ></span>
+
+                    ${p.name}
+
+                </div>
+
+                <div class="player-info">
+
+                    ${p.computer
+                        ?"🤖 Computer"
+                        :"🎮 Human"}
+
+                    &nbsp; • &nbsp;
+
+                    ${home}/4 Home
+
+                </div>
+
+            `;
+
+            list.appendChild(div);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(text){
+
+    document.getElementById(
+        "message"
+    ).textContent=text;
+
+}
+
+
+/* =========================================================
+   WINNER
+========================================================= */
+
+function showWinner(player){
+
+    gameOver=true;
+
+    document.getElementById(
+        "winnerTitle"
+    ).textContent=
+        `${player.name} WINS!`;
+
+    document.getElementById(
+        "winnerMessage"
+    ).textContent=
+        `🏆 ${player.color.toUpperCase()} has conquered LUDO-A! 🏆`;
+
+    document.getElementById(
+        "winner"
+    ).classList.add("show");
+
+    document.getElementById(
+        "rollBtn"
+    ).disabled=true;
+
+}
+
+
+/* =========================================================
+   CAPTURE EFFECT
+========================================================= */
+
+function flashCapture(){
+
+    const board=
+        document.querySelector(
+            ".board-frame"
+        );
+
+    board.animate(
+        [
+            {
+                transform:"scale(1)"
+            },
+            {
+                transform:"scale(1.015)"
+            },
+            {
+                transform:"scale(1)"
+            }
+        ],
+        {
+            duration:300
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BOARD CLICK
+========================================================= */
+
+function selectPieceAt(
+    clientX,
+    clientY
+){
+
+    if(
+        !choosingPiece||
+        rolling||
+        gameOver
+    ){
+
+        return;
+
+    }
+
+    const rect=
+        canvas.getBoundingClientRect();
+
+    const x=
+        (
+            clientX-
+            rect.left
+        )*
+        (
+            canvasSize/
+            rect.width
+        );
+
+    const y=
+        (
+            clientY-
+            rect.top
+        )*
+        (
+            canvasSize/
+            rect.height
+        );
+
+    const cell=
+        canvasSize/15;
+
+    const player=
+        players[currentPlayer];
+
+    for(let i=0;i<4;i++){
+
+        if(
+            !canMove(
+                currentPlayer,
+                i
+            )
+        ){
+
+            continue;
+
+        }
+
+        const pos=
+            piecePosition(
+                player,
+                player.pieces[i],
+                i
+            );
+
+        const cx=
+            pos[0]*cell+
+            cell/2;
+
+        const cy=
+            pos[1]*cell+
+            cell/2;
+
+        const distance=
+            Math.hypot(
+                x-cx,
+                y-cy
+            );
+
+        if(
+            distance<
+            cell*.55
+        ){
+
+            movePiece(
+                currentPlayer,
+                i
+            );
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+canvas.addEventListener(
+    "click",
+    event=>{
+
+        selectPieceAt(
+            event.clientX,
+            event.clientY
+        );
+
+    }
+);
+
+
+canvas.addEventListener(
+    "touchstart",
+    event=>{
+
+        if(
+            event.touches.length!==1
+        ){
+
+            return;
+
+        }
+
+        const touch=
+            event.touches[0];
+
+        selectPieceAt(
+            touch.clientX,
+            touch.clientY
+        );
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+/* =========================================================
+   COLOR PREVIEW
+========================================================= */
+
+for(let i=0;i<4;i++){
+
+    document.getElementById(
+        `color${i}`
+    ).addEventListener(
+        "change",
+        function(){
+
+            const dot=
+                document
+                    .getElementById(
+                        `config${i}`
+                    )
+                    .querySelector(
+                        ".color-dot"
+                    );
+
+            dot.className=
+                `color-dot ${this.value}`;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ANIMATION LOOP
+========================================================= */
+
+function animationLoop(){
+
+    if(
+        document.visibilityState==="visible"&&
+        document
+            .getElementById("game")
+            .classList
+            .contains("active")
+    ){
+
+        draw();
+
+    }
+
+    requestAnimationFrame(
+        animationLoop
+    );
+
+}
+
+
+requestAnimationFrame(
+    animationLoop
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+resizeCanvas();
+
+</script>
+
+</body>
+</html>
